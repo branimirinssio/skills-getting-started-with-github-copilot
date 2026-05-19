@@ -7,8 +7,6 @@ Tests follow the Arrange-Act-Assert (AAA) pattern:
 - Assert: Verify the response and side effects
 """
 
-import pytest
-
 
 class TestRootEndpoint:
     """Tests for the root GET / endpoint"""
