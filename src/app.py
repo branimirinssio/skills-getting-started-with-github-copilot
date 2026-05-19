@@ -98,7 +98,8 @@ def signup_for_activity(activity_name: str, email: str):
     if activity_name not in activities:
         raise HTTPException(status_code=404, detail="Activity not found")
 
-    # Validate email format
+    # Normalize and validate email
+    email = email.strip().lower()
     if not EMAIL_PATTERN.match(email):
         raise HTTPException(status_code=422, detail="Invalid email address")
 
@@ -121,7 +122,8 @@ def unregister_from_activity(activity_name: str, email: str):
     if activity_name not in activities:
         raise HTTPException(status_code=404, detail="Activity not found")
 
-    # Validate email format
+    # Normalize and validate email
+    email = email.strip().lower()
     if not EMAIL_PATTERN.match(email):
         raise HTTPException(status_code=422, detail="Invalid email address")
 
