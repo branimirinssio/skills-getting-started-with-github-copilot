@@ -2,6 +2,7 @@
 Pytest configuration and shared fixtures for FastAPI tests
 """
 
+import copy
 import pytest
 from fastapi.testclient import TestClient
 from src.app import app, activities
@@ -77,15 +78,16 @@ def reset_activities_state(initial_activities):
     activities dict to its initial state. This prevents tests from interfering
     with each other when they modify the participants list.
     """
-    # Clear and restore the activities dict
+    # Clear and restore the activities dict using deep copies to prevent
+    # mutations during a test from affecting the initial state
     activities.clear()
-    activities.update(initial_activities)
+    activities.update(copy.deepcopy(initial_activities))
     
     yield
     
     # Clean up after test (optional but good practice)
     activities.clear()
-    activities.update(initial_activities)
+    activities.update(copy.deepcopy(initial_activities))
 
 
 @pytest.fixture

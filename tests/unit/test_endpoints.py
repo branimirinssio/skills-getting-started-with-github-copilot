@@ -213,3 +213,115 @@ class TestSignupEndpoint:
         participants = activities[activity_name]["participants"]
         assert student1_email in participants
         assert student2_email in participants
+
+    def test_signup_invalid_email(self, client):
+        """
+        Arrange: Activity name and invalid email
+        Act: Make POST request to signup with invalid email
+        Assert: Verify 422 status and error detail
+        """
+        # Arrange
+        activity_name = "Chess Club"
+        invalid_email = "not-an-email"
+
+        # Act
+        response = client.post(
+            f"/activities/{activity_name}/signup",
+            params={"email": invalid_email}
+        )
+
+        # Assert
+        assert response.status_code == 422
+
+
+class TestUnregisterEndpoint:
+    """Tests for the POST /activities/{activity_name}/unregister endpoint"""
+
+    def test_unregister_activity(self, client):
+        """
+        Arrange: Student already signed up for an activity
+        Act: Make POST request to unregister
+        Assert: Verify 200 status and student removed from activity
+        """
+        # Arrange
+        activity_name = "Chess Club"
+        student_email = "michael@mergington.edu"
+
+        # Act
+        response = client.post(
+            f"/activities/{activity_name}/unregister",
+            params={"email": student_email}
+        )
+
+        # Assert
+        assert response.status_code == 200
+        data = response.json()
+        assert "message" in data
+
+        # Verify student was removed from the activity
+        activities_response = client.get("/activities")
+        activities = activities_response.json()
+        assert student_email not in activities[activity_name]["participants"]
+
+    def test_unregister_nonexistent_activity(self, client):
+        """
+        Arrange: Invalid (non-existent) activity name
+        Act: Make POST request to unregister from non-existent activity
+        Assert: Verify 404 status and error detail
+        """
+        # Arrange
+        activity_name = "NonExistent Activity"
+        student_email = "student@mergington.edu"
+
+        # Act
+        response = client.post(
+            f"/activities/{activity_name}/unregister",
+            params={"email": student_email}
+        )
+
+        # Assert
+        assert response.status_code == 404
+        data = response.json()
+        assert "detail" in data
+        assert "Activity not found" in data["detail"]
+
+    def test_unregister_student_not_signed_up(self, client):
+        """
+        Arrange: Student not signed up for an activity
+        Act: Make POST request to unregister
+        Assert: Verify 404 status and error detail
+        """
+        # Arrange
+        activity_name = "Chess Club"
+        student_email = "noone@mergington.edu"
+
+        # Act
+        response = client.post(
+            f"/activities/{activity_name}/unregister",
+            params={"email": student_email}
+        )
+
+        # Assert
+        assert response.status_code == 404
+        data = response.json()
+        assert "detail" in data
+        assert "not signed up" in data["detail"]
+
+    def test_unregister_invalid_email(self, client):
+        """
+        Arrange: Activity name and invalid email
+        Act: Make POST request to unregister with invalid email
+        Assert: Verify 422 status and error detail
+        """
+        # Arrange
+        activity_name = "Chess Club"
+        invalid_email = "not-an-email"
+
+        # Act
+        response = client.post(
+            f"/activities/{activity_name}/unregister",
+            params={"email": invalid_email}
+        )
+
+        # Assert
+        assert response.status_code == 422
