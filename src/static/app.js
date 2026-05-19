@@ -20,20 +20,61 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
-        const participantsList = details.participants.length > 0
-          ? `<ul>${details.participants.map(p => `<li><span>${p}</span><button class="delete-participant" data-activity="${name}" data-email="${p}" title="Unregister">✕</button></li>`).join('')}</ul>`
-          : '<p class="no-participants">No participants yet</p>';
+        const title = document.createElement("h4");
+        title.textContent = name;
 
-        activityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
-          <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
-          <div class="participants-section">
-            <strong>Participants:</strong>
-            ${participantsList}
-          </div>
-        `;
+        const description = document.createElement("p");
+        description.textContent = details.description;
+
+        const schedule = document.createElement("p");
+        const scheduleLabel = document.createElement("strong");
+        scheduleLabel.textContent = "Schedule:";
+        schedule.appendChild(scheduleLabel);
+        schedule.appendChild(document.createTextNode(` ${details.schedule}`));
+
+        const availability = document.createElement("p");
+        const availabilityLabel = document.createElement("strong");
+        availabilityLabel.textContent = "Availability:";
+        availability.appendChild(availabilityLabel);
+        availability.appendChild(document.createTextNode(` ${spotsLeft} spots left`));
+
+        const participantsSection = document.createElement("div");
+        participantsSection.className = "participants-section";
+        const participantsLabel = document.createElement("strong");
+        participantsLabel.textContent = "Participants:";
+        participantsSection.appendChild(participantsLabel);
+
+        if (details.participants.length > 0) {
+          const participantsList = document.createElement("ul");
+          details.participants.forEach((p) => {
+            const listItem = document.createElement("li");
+            const participantText = document.createElement("span");
+            participantText.textContent = p;
+
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "delete-participant";
+            deleteButton.dataset.activity = name;
+            deleteButton.dataset.email = p;
+            deleteButton.title = "Unregister";
+            deleteButton.textContent = "✕";
+
+            listItem.appendChild(participantText);
+            listItem.appendChild(deleteButton);
+            participantsList.appendChild(listItem);
+          });
+          participantsSection.appendChild(participantsList);
+        } else {
+          const noParticipants = document.createElement("p");
+          noParticipants.className = "no-participants";
+          noParticipants.textContent = "No participants yet";
+          participantsSection.appendChild(noParticipants);
+        }
+
+        activityCard.appendChild(title);
+        activityCard.appendChild(description);
+        activityCard.appendChild(schedule);
+        activityCard.appendChild(availability);
+        activityCard.appendChild(participantsSection);
 
         // Add delete handlers for each participant
         activityCard.querySelectorAll('.delete-participant').forEach(btn => {
